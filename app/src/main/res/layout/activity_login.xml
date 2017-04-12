@@ -71,10 +71,10 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/login"
+                    android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_login"
+                    android:hint="@string/prompt_email"
                     android:inputType="text"
                     android:maxLines="1"
                     android:textColor="?attr/main_colorDark"
