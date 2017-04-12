@@ -23,14 +23,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * A login screen that offers login via login/password.
+ * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
     public static final String APP_TAG = "Uno";
 
     // UI references.
-    private EditText mLoginView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mLoginView = (EditText) findViewById(R.id.login);
+        mEmailView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         Button signInButton = (Button) findViewById(R.id.login_button);
@@ -85,20 +85,16 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Attempts to sign in.
-     * If there are form errors (invalid login, missing fields, etc.), the
+     * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-//        if (mAuthTask != null) {
-//            return;
-//        }
-
         // Reset errors.
-        mLoginView.setError(null);
+        mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String login = mLoginView.getText().toString();
+        String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -112,13 +108,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Check for a valid login address.
-        if (TextUtils.isEmpty(login)) {
-            mLoginView.setError(getString(R.string.error_field_required));
-            focusView = mLoginView;
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
             cancel = true;
-        } else if (!isLoginValid(login)) {
-            mLoginView.setError(getString(R.string.error_invalid_login));
-            focusView = mLoginView;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
             cancel = true;
         }
 
@@ -131,8 +127,8 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(true);
 
             UnoHouseAPI apiService = UnoHouseAPIClient.getClient().create(UnoHouseAPI.class);
-            Credentials credentials = new Credentials(login, password);
-            Call<AuthenticationResponse> call = apiService.authenticate(login, password);
+            Credentials credentials = new Credentials(email, password);
+            Call<AuthenticationResponse> call = apiService.authenticate(email, password);
             call.enqueue(new Callback<AuthenticationResponse>() {
 
                 @Override
@@ -162,9 +158,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isLoginValid(String login) {
-        //TODO: Replace this with your own logic
-        return login.length() > 3;
+    private boolean isEmailValid(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isPasswordValid(String password) {

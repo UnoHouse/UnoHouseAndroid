@@ -7,14 +7,14 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Credentials {
-    @SerializedName("login")
-    String login;
+    @SerializedName("email")
+    String email;
 
     @SerializedName("password")
     String password;
 
-    public Credentials(String login, String password) {
-        this.login = login;
+    public Credentials(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 }
