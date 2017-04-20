@@ -22,5 +22,6 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("pl.com.salwa.unohouse.unohouseandroid", appContext.getPackageName());
+
     }
 }

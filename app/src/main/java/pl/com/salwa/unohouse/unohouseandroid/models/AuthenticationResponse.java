@@ -5,6 +5,7 @@ package pl.com.salwa.unohouse.unohouseandroid.models;
  */
 
 public class AuthenticationResponse {
+
     boolean result;
 
     public boolean getResult() {

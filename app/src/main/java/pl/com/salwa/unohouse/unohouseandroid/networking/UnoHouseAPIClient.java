@@ -12,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UnoHouseAPIClient {
 
-    static final String BASE_URL = "http://salwa.com.pl/arduino/api/";
+    static final String BASE_URL = "http://195.181.209.40/api/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

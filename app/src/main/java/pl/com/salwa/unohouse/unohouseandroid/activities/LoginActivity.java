@@ -3,44 +3,40 @@ package pl.com.salwa.unohouse.unohouseandroid.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import pl.com.salwa.unohouse.unohouseandroid.callbacks.AuthenticateCallback;
 import pl.com.salwa.unohouse.unohouseandroid.models.AuthenticationResponse;
-import pl.com.salwa.unohouse.unohouseandroid.models.Credentials;
 import pl.com.salwa.unohouse.unohouseandroid.networking.UnoHouseAPI;
 import pl.com.salwa.unohouse.unohouseandroid.networking.UnoHouseAPIClient;
+import pl.com.salwa.unohouse.unohouseandroid.utils.Validator;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-/**
- * A login screen that offers login via login/password.
- */
 public class LoginActivity extends AppCompatActivity {
 
     public static final String APP_TAG = "Uno";
 
     // UI references.
-    private EditText mLoginView;
-    private EditText mPasswordView;
+    private EditText mEmailView;
+    public EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private UnoHouseAPI apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mLoginView = (EditText) findViewById(R.id.login);
+        mEmailView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         Button signInButton = (Button) findViewById(R.id.login_button);
@@ -54,71 +50,41 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        checkAppVersion();
-    }
-
-    private void checkAppVersion() {
-        showProgress(true);
-
-        UnoHouseAPI apiService = UnoHouseAPIClient.getClient().create(UnoHouseAPI.class);
-
-        Call<String> call = apiService.latestVersion();
-        call.enqueue(new Callback<String>() {
-
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                int statusCode = response.code();
-                Log.d(APP_TAG, statusCode + " status code");
-                String s = response.body();
-
-                    Log.d(APP_TAG, s + " result");
-                showProgress(false);
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.d(APP_TAG, t.toString());
-                showProgress(false);
-            }
-        });
+        apiService = UnoHouseAPIClient.getClient().create(UnoHouseAPI.class);
     }
 
     /**
      * Attempts to sign in.
-     * If there are form errors (invalid login, missing fields, etc.), the
+     * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-//        if (mAuthTask != null) {
-//            return;
-//        }
-
         // Reset errors.
-        mLoginView.setError(null);
+        mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String login = mLoginView.getText().toString();
+        String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !Validator.isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid login address.
-        if (TextUtils.isEmpty(login)) {
-            mLoginView.setError(getString(R.string.error_field_required));
-            focusView = mLoginView;
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
             cancel = true;
-        } else if (!isLoginValid(login)) {
-            mLoginView.setError(getString(R.string.error_invalid_login));
-            focusView = mLoginView;
+        } else if (!Validator.isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
             cancel = true;
         }
 
@@ -130,53 +96,16 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and perform the user login attempt.
             showProgress(true);
 
-            UnoHouseAPI apiService = UnoHouseAPIClient.getClient().create(UnoHouseAPI.class);
-            Credentials credentials = new Credentials(login, password);
-            Call<AuthenticationResponse> call = apiService.authenticate(login, password);
-            call.enqueue(new Callback<AuthenticationResponse>() {
-
-                @Override
-                public void onResponse(Call<AuthenticationResponse> call, Response<AuthenticationResponse> response) {
-                    int statusCode = response.code();
-                    Log.d(APP_TAG, statusCode + " status code");
-                    AuthenticationResponse authResponse = response.body();
-                    if (authResponse != null)
-                        Log.d(APP_TAG, authResponse.getResult() + " result");
-                    showProgress(false);
-
-                    if (authResponse.getResult()) {
-                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                        startActivity(intent);
-                    } else {
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<AuthenticationResponse> call, Throwable t) {
-                    Log.d(APP_TAG, t.toString());
-                    showProgress(false);
-                }
-            });
+            Call<AuthenticationResponse> call = apiService.authenticate(email, password);
+            call.enqueue(new AuthenticateCallback(this));
         }
-    }
-
-    private boolean isLoginValid(String login) {
-        //TODO: Replace this with your own logic
-        return login.length() > 3;
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 3;
     }
 
     /**
      * Shows the progress UI and hides the login form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
+    public void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
@@ -206,5 +135,12 @@ public class LoginActivity extends AppCompatActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    /**
+     * Inject custom API for testing purposes
+     */
+    public void setApi(UnoHouseAPI api) {
+        apiService = api;
     }
 }
