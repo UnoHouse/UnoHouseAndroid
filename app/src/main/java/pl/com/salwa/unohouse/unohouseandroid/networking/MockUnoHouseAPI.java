@@ -1,8 +1,7 @@
 package pl.com.salwa.unohouse.unohouseandroid.networking;
 
-import android.util.Log;
-
 import pl.com.salwa.unohouse.unohouseandroid.models.AuthenticationResponse;
+import pl.com.salwa.unohouse.unohouseandroid.models.CheckNewVersionResponse;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.mock.BehaviorDelegate;
@@ -25,7 +24,7 @@ public class MockUnoHouseAPI implements UnoHouseAPI {
     }
 
     @Override
-    public Call<String> latestVersion() {
+    public Call<CheckNewVersionResponse> latestVersion() {
         String response = "{}";
         return delegate.returningResponse(response).latestVersion();
     }

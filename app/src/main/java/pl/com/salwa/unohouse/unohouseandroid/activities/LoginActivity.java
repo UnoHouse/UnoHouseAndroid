@@ -21,8 +21,6 @@ import retrofit2.Call;
 
 public class LoginActivity extends AppCompatActivity {
 
-    public static final String APP_TAG = "Uno";
-
     // UI references.
     private EditText mEmailView;
     public EditText mPasswordView;
@@ -59,16 +57,16 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+        boolean cancel = false;
+        View focusView = null;
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+        // Reset errors.
+        mEmailView.setError(null);
+        mPasswordView.setError(null);
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password) || !Validator.isPasswordValid(password)) {

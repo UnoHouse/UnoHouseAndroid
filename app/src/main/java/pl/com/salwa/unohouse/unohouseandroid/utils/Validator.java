@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  */
 
 /**
- * final class can not be extended
+ * Final class can not be extended
  */
 public final class Validator {
 
