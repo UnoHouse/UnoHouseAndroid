@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!-- Blue Grey Theme Colors -->
+    <color name="colorBlueGreyLight">#ECEFF1</color>
+    <color name="colorBlueGreyDark">#263238</color>
+    <color name="colorBlueGreyAccent">#2196F3</color>
+    <color name="textColorBlueGreyDark">#263238</color>
+    <color name="textColorBlueGreyLight">#ECEFF1</color>
+
 </resources>
